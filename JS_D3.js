@@ -46,19 +46,41 @@ var graticule = d3.geo.graticule();
         }
         return false;
       });
-      var scale = d3.scale.linear().range([1,20])
+      var scale = d3.scale.linear().range([2,7,20])
         .domain([d3.min(validVals,massVal),
+                 d3.mean(validVals,massVal),
                  d3.max(validVals,massVal)]);
       function getRadius(d){
         return scale(d.properties.mass);
       };
       
-      svg.selectAll(".hits")
+      var hits = svg.selectAll(".hits")
         .data(validVals).enter()
         .append("circle")
         .attr("r",getRadius)
-        .style("fill","rgba(0,0,0,0.5)")
+        .style("fill","rgba(200,0,200,0.5)")
         .attr("transform",function(d){return "translate("+projection(d.geometry.coordinates)+")"});
+      
+      var Months = ["Jan.","Feb.","Mar.","Apr.","May","Jun.","Jul.","Aug.","Sep.","Oct.","Nov.","Dec."];
+      function formatDate(string){
+        var date = new Date(string);
+        return Months[date.getMonth()-1]+" "+date.getDate()+", "+date.getFullYear();
+      }
+      
+      hits.on("mouseover",function(d){
+        tooltip.classed("hide",false)
+          .style("left",d3.event.pageX+"px")
+          .style("top",d3.event.pageY+"px")
+          .text("Name: "+d.properties.name+
+               "\nMass: "+d.properties.mass+
+               "\nDate: "+formatDate(d.properties.year));
+      });
+      hits.on("mouseout",function(){
+        tooltip.classed("hide",true);
+      })
     });
   });
 });
+
+var tooltip = d3.select("body").append("div")
+  .attr("class","tip hide");
