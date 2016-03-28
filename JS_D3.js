@@ -36,5 +36,16 @@ var graticule = d3.geo.graticule();
       .attr("class","country")
       .attr("d",path)
       .style("fill",function(d,i){return color(d.color = d3.max(neighbors[i], function(n){return countries[n].color;}) + 1 | 0);});
+    
+    $.get(dataUrl,function(results){
+      var meteorHits = JSON.parse(results);
+      
+      svg.selectAll(".hits")
+        .data(meteorHits.features).enter()
+        .append("circle")
+        .attr("r",3)
+        .style("fill","black")
+        .attr("transform",function(d){return "translate("+projection(d.geometry.coordinates)+")"});
+    });
   });
 });
